@@ -1,0 +1,51 @@
+spring:
+  profiles:
+    group:
+      prod: common,production
+      dev: common,local
+---
+spring:
+  config:
+    activate:
+      on-profile: common
+  application:
+    name: connect
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: {rds-user-name}
+    password: {rds-user-passwd}
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    generate-ddl: false
+---
+spring:
+  config:
+    activate:
+      on-profile: production
+  datasource:
+    url: jdbc:mysql://{rds-endpoint}/{database-name}
+  jpa:
+    hibernate:
+      ddl-auto: update
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:mysql://localhost:[forwardedPort]/{database-name}
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: update
+ssh:
+  ssh_host: {ec2-public-IP}
+  ssh_port: 22
+  ssh_user: {ec2-user-name}
+  ssh_key: ./src/main/resources/ssh/ssh.pem
+  database_port: 3306
+  database_host: {rds-endpoint}
